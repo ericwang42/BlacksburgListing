@@ -1,10 +1,10 @@
-var express = require('express');
-var router = express.Router();
-var apartmentListingController = require('../controllers/apartmentListingController');
+const express = require('express');
+const router = express.Router();
+const apartmentListingController = require('../controllers/apartmentListingController');
 
-router.get('/', apartmentListingController.listAll);
-router.post('/', apartmentListingController.create);
-router.put('/:id', apartmentListingController.update);
-router.delete('/:id', apartmentListingController.delete);
+router.post('/', apartmentListingController.createApartmentListing);
+router.put('/:id', apartmentListingController.updateApartmentListing);
+router.delete('/:id', apartmentListingController.deleteApartmentListing);
+router.get('/', apartmentListingController.readApartmentListing);
 
 module.exports = router;
