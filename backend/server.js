@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require("cors")
 const app = express()
-const port = 3000
+const port = 3001
 
 app.use(express.json());
 app.use(cors())
@@ -12,11 +12,11 @@ const apartmentListingRoutes = require('./routes/apartmentListingRoutes');
 const dormListingRoutes = require('./routes/dormListingRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 
-app.use('/api/blacksburg_resident', blacksburgResidentRoutes);
-app.use('/api/apartment_leaser', apartmentLeaserRoutes);
-app.use('/api/apartment_listing', apartmentListingRoutes);
-app.use('/api/dorm_listing', dormListingRoutes);
-app.use('/api/review', reviewRoutes);
+app.use('/api/Blacksburg_Resident', blacksburgResidentRoutes);
+app.use('/api/Apartment_Leaser', apartmentLeaserRoutes);
+app.use('/api/Apartment_Listing', apartmentListingRoutes);
+app.use('/api/Dorm_Listing', dormListingRoutes);
+app.use('/api/Review', reviewRoutes);
 
 // checks for any unhandled requests
 app.use('*', (req, res) => {
