@@ -3,8 +3,9 @@ const router = express.Router()
 const dormListingController = require('../controllers/dormListingController')
 
 router.post('/', dormListingController.createDormListing)
+router.get('/', dormListingController.readDormListing)
+router.get('/:id', dormListingController.readDormListingById)
 router.put('/:id', dormListingController.updateDormListing)
 router.delete('/:id', dormListingController.deleteDormListing)
-router.get('/', dormListingController.readDormListing)
 
 module.exports = router

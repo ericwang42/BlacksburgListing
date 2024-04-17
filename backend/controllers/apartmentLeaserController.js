@@ -16,6 +16,24 @@ exports.createLeaser = (req, res) => {
     )
 }
 
+exports.readLeaser = (req, res) => {
+    const sql = 'SELECT * FROM Apartment_Leaser'
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).send(err)
+        res.json(results)
+    })
+}
+
+exports.readLeaserById = (req, res) => {
+    const { id } = req.params
+    const sql = 'SELECT * FROM Apartment_Leaser WHERE leaser_id = ?'
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).send(err)
+        res.status(200).send('Leaser retrieved successfully')
+        res.json(result)
+    })
+}
+
 exports.updateLeaser = (req, res) => {
     const { first_name, last_name, date_of_birth, school_year } = req.body
     const { id } = req.params
@@ -41,13 +59,5 @@ exports.deleteLeaser = (req, res) => {
         if (result.affectedRows == 0)
             return res.status(404).send('Leaser not found')
         res.send('Leaser deleted successfully')
-    })
-}
-
-exports.readLeaser = (req, res) => {
-    const sql = 'SELECT * FROM Apartment_Leaser'
-    db.query(sql, (err, results) => {
-        if (err) return res.status(500).send(err)
-        res.json(results)
     })
 }

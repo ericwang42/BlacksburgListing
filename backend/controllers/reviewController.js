@@ -28,6 +28,24 @@ exports.createReview = (req, res) => {
     )
 }
 
+exports.readReview = (req, res) => {
+    const sql = 'SELECT * FROM Review'
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).send(err)
+        res.json(results)
+    })
+}
+
+exports.readReviewById = (req, res) => {
+    const { id } = req.params
+    const sql = 'SELECT * FROM Review WHERE review_id = ?'
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).send(err)
+        res.status(200).send('Review retrieved successfully')
+        res.json(result)
+    })
+}
+
 exports.updateReview = (req, res) => {
     const {
         rating,
@@ -66,13 +84,5 @@ exports.deleteReview = (req, res) => {
         if (result.affectedRows == 0)
             return res.status(404).send('Review not found')
         res.send('Review deleted successfully')
-    })
-}
-
-exports.readReview = (req, res) => {
-    const sql = 'SELECT * FROM Review'
-    db.query(sql, (err, results) => {
-        if (err) return res.status(500).send(err)
-        res.json(results)
     })
 }

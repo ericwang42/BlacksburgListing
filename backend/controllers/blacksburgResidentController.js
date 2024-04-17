@@ -18,6 +18,27 @@ exports.createResident = (req, res) => {
     )
 }
 
+exports.readResident = (req, res) => {
+    const sql = 'SELECT * FROM Blacksburg_Resident'
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).send(err)
+        }
+
+        res.json(results)
+    })
+}
+
+exports.readResidentById = (req, res) => {
+    const { id } = req.params
+    const sql = 'SELECT * FROM Blacksburg_Resident WHERE resident_id = ?'
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).send(err)
+        res.status(200).send('Resident retrieved successfully')
+        res.json(result)
+    })
+}
+
 exports.updateResident = (req, res) => {
     const { first_name, last_name, date_of_birth, school_year } = req.body
     const { id } = req.params
@@ -46,16 +67,5 @@ exports.deleteResident = (req, res) => {
             return res.status(404).send('Resident not found')
         }
         res.send('Resident deleted successfully')
-    })
-}
-
-exports.readResident = (req, res) => {
-    const sql = 'SELECT * FROM Blacksburg_Resident'
-    db.query(sql, (err, results) => {
-        if (err) {
-            return res.status(500).send(err)
-        }
-
-        res.json(results)
     })
 }

@@ -32,6 +32,24 @@ exports.createApartmentListing = (req, res) => {
     )
 }
 
+exports.readApartmentListing = (req, res) => {
+    const sql = 'SELECT * FROM Apartment_Listing'
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).send(err)
+        res.json(results)
+    })
+}
+
+exports.readApartmentListingById = (req, res) => {
+    const { id } = req.params
+    const sql = 'SELECT * FROM Apartment_Listing WHERE apartment_id = ?'
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).send(err)
+        res.status(200).send('Apartment listing retrieved successfully')
+        res.json(result)
+    })
+}
+
 exports.updateApartmentListing = (req, res) => {
     const {
         street_address,
@@ -74,13 +92,5 @@ exports.deleteApartmentListing = (req, res) => {
         if (result.affectedRows == 0)
             return res.status(404).send('Apartment listing not found')
         res.send('Apartment listing deleted successfully')
-    })
-}
-
-exports.readApartmentListing = (req, res) => {
-    const sql = 'SELECT * FROM Apartment_Listing'
-    db.query(sql, (err, results) => {
-        if (err) return res.status(500).send(err)
-        res.json(results)
     })
 }
