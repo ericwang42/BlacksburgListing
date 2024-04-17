@@ -9,9 +9,11 @@ exports.createApartmentListing = (req, res) => {
         zip_code,
         leaser_name,
         leaser_no,
+        price,
+        description
     } = req.body
     const sql =
-        'INSERT INTO Apartment_Listing (street_address, apt_number, city, state, zip_code, leaser_name, leaser_no) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO Apartment_Listing (street_address, apt_number, city, state, zip_code, leaser_name, leaser_no, price, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
     db.query(
         sql,
         [
@@ -22,6 +24,8 @@ exports.createApartmentListing = (req, res) => {
             zip_code,
             leaser_name,
             leaser_no,
+            price,
+            description
         ],
         (err, result) => {
             if (err) return res.status(500).send(err)
@@ -59,6 +63,8 @@ exports.updateApartmentListing = (req, res) => {
         zip_code,
         leaser_name,
         leaser_no,
+        price,
+        description
     } = req.body
     const { id } = req.params
     const sql =
@@ -73,6 +79,8 @@ exports.updateApartmentListing = (req, res) => {
             zip_code,
             leaser_name,
             leaser_no,
+            price,
+            description,
             id,
         ],
         (err, result) => {

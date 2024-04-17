@@ -1,13 +1,13 @@
 const db = require('../database')
 
 exports.createDormListing = (req, res) => {
-    const { street_address, room_number, city, state, zip_code, dorm_name } =
+    const { street_address, room_number, city, state, zip_code, dorm_name, price, description } =
         req.body
     const sql =
-        'INSERT INTO Dorm_Listing (street_address, room_number, city, state, zip_code, dorm_name) VALUES (?, ?, ?, ?, ?, ?)'
+        'INSERT INTO Dorm_Listing (street_address, room_number, city, state, zip_code, dorm_name, price, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     db.query(
         sql,
-        [street_address, room_number, city, state, zip_code, dorm_name],
+        [street_address, room_number, city, state, zip_code, dorm_name, price, description],
         (err, result) => {
             if (err) return res.status(500).send(err)
             res.status(201).send(
@@ -36,14 +36,14 @@ exports.readDormListingById = (req, res) => {
 }
 
 exports.updateDormListing = (req, res) => {
-    const { street_address, room_number, city, state, zip_code, dorm_name } =
+    const { street_address, room_number, city, state, zip_code, dorm_name , price, description } =
         req.body
     const { id } = req.params
     const sql =
-        'UPDATE Dorm_Listing SET street_address = ?, room_number = ?, city = ?, state = ?, zip_code = ?, dorm_name = ? WHERE dorm_id = ?'
+        'UPDATE Dorm_Listing SET street_address = ?, room_number = ?, city = ?, state = ?, zip_code = ?, dorm_name = ?, price = ?, description = ? WHERE dorm_id = ?'
     db.query(
         sql,
-        [street_address, room_number, city, state, zip_code, dorm_name, id],
+        [street_address, room_number, city, state, zip_code, dorm_name, price, description, id],
         (err, result) => {
             if (err) return res.status(500).send(err)
             if (result.affectedRows == 0)
