@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+.account-card {
+  box-shadow: 5px 5px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.josefin-sans {
+  font-family: "Josefin Sans", sans-serif;
+  font-optical-sizing: auto;
+  /* Set the desired font weight */
+  font-weight: 400; /* For example: 400 for regular, 700 for bold */
+  font-style: normal;
+}
