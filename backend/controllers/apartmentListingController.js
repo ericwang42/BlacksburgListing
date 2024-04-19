@@ -10,10 +10,11 @@ exports.createApartmentListing = (req, res) => {
         leaser_name,
         leaser_no,
         price,
-        description
+        description,
     } = req.body
-    const sql =
-        'INSERT INTO Apartment_Listing (street_address, apt_number, city, state, zip_code, leaser_name, leaser_no, price, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+
+    const sql = `INSERT INTO Apartment_Listing (street_address, apt_number, city, state, zip_code, leaser_name, leaser_no, price, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
     db.query(
         sql,
         [
@@ -25,32 +26,47 @@ exports.createApartmentListing = (req, res) => {
             leaser_name,
             leaser_no,
             price,
-            description
+            description,
         ],
         (err, result) => {
-            if (err) return res.status(500).send(err)
-            res.status(201).send(
-                `Apartment listing added successfully with ID: ${result.insertId}`
-            )
+            if (err) {
+                return res.status(500).send(err)
+            }
+
+            return res
+                .status(201)
+                .send(
+                    `Apartment listing created successfully with ID: ${result.insertId}`
+                )
         }
     )
 }
 
 exports.readApartmentListing = (req, res) => {
-    const sql = 'SELECT * FROM Apartment_Listing'
+    const sql = `SELECT * FROM Apartment_Listing`
+
     db.query(sql, (err, results) => {
-        if (err) return res.status(500).send(err)
-        res.json(results)
+        if (err) {
+            return res.status(500).send(err)
+        }
+
+        res.status(200).send('Apartment listings retrieved successfully')
+        return res.json(results)
     })
 }
 
 exports.readApartmentListingById = (req, res) => {
     const { id } = req.params
-    const sql = 'SELECT * FROM Apartment_Listing WHERE apartment_id = ?'
+
+    const sql = `SELECT * FROM Apartment_Listing WHERE apartment_id = ?`
+
     db.query(sql, [id], (err, result) => {
-        if (err) return res.status(500).send(err)
+        if (err) {
+            return res.status(500).send(err)
+        }
+
         res.status(200).send('Apartment listing retrieved successfully')
-        res.json(result)
+        return res.json(result)
     })
 }
 
@@ -64,11 +80,12 @@ exports.updateApartmentListing = (req, res) => {
         leaser_name,
         leaser_no,
         price,
-        description
+        description,
     } = req.body
     const { id } = req.params
-    const sql =
-        'UPDATE Apartment_Listing SET street_address = ?, apt_number = ?, city = ?, state = ?, zip_code = ?, leaser_name = ?, leaser_no = ? WHERE apartment_id = ?'
+
+    const sql = `UPDATE Apartment_Listing SET street_address = ?, apt_number = ?, city = ?, state = ?, zip_code = ?, leaser_name = ?, leaser_no = ? WHERE apartment_id = ?`
+
     db.query(
         sql,
         [
@@ -84,21 +101,35 @@ exports.updateApartmentListing = (req, res) => {
             id,
         ],
         (err, result) => {
-            if (err) return res.status(500).send(err)
-            if (result.affectedRows == 0)
+            if (err) {
+                return res.status(500).send(err)
+            }
+
+            if (result.affectedRows == 0) {
                 return res.status(404).send('Apartment listing not found')
-            res.send('Apartment listing updated successfully')
+            }
+
+            return res
+                .status(200)
+                .send('Apartment listing updated successfully')
         }
     )
 }
 
 exports.deleteApartmentListing = (req, res) => {
     const { id } = req.params
-    const sql = 'DELETE FROM Apartment_Listing WHERE apartment_id = ?'
+
+    const sql = `DELETE FROM Apartment_Listing WHERE apartment_id = ?`
+
     db.query(sql, [id], (err, result) => {
-        if (err) return res.status(500).send(err)
-        if (result.affectedRows == 0)
+        if (err) {
+            return res.status(500).send(err)
+        }
+
+        if (result.affectedRows == 0) {
             return res.status(404).send('Apartment listing not found')
-        res.send('Apartment listing deleted successfully')
+        }
+
+        return res.status(200).send('Apartment listing deleted successfully')
     })
 }
