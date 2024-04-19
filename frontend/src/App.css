@@ -41,6 +41,10 @@
   box-shadow: 5px 5px 2px 1px rgba(0, 0, 0, 0.2);
 }
 
+.card {
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.3);
+}
+
 .josefin-sans {
   font-family: "Josefin Sans", sans-serif;
   font-optical-sizing: auto;
