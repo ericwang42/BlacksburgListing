@@ -20,7 +20,6 @@ app.use('/api/Dorm_Listing', dormListingRoutes)
 app.use('/api/Review', reviewRoutes)
 app.use('/api/Admin', adminRoutes)
 
-
 // checks for any unhandled requests
 app.use('*', (req, res) => {
     res.status(404).send('404 Not Found')
