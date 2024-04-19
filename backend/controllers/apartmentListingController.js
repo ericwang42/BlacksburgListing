@@ -50,6 +50,10 @@ exports.readApartmentListing = (req, res) => {
             return res.status(500).send(err)
         }
 
+        if (results.length == 0) {
+            return res.status(404).send('No apartment listings found')
+        }
+
         res.status(200).send('Apartment listings retrieved successfully')
         return res.json(results)
     })
@@ -65,8 +69,42 @@ exports.readApartmentListingById = (req, res) => {
             return res.status(500).send(err)
         }
 
+        if (result.length == 0) {
+            return res
+                .status(404)
+                .send('No apartment listing found with this id')
+        }
+
         res.status(200).send('Apartment listing retrieved successfully')
         return res.json(result)
+    })
+}
+
+exports.getReviewsForApartment = (req, res) => {
+    const { id } = req.params
+
+    const sql = `
+        SELECT r.review_id
+        FROM Review r
+        WHERE r.apartment_review_id = ?
+    `
+
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            return res.status(500).send(err)
+        }
+
+        if (results.length == 0) {
+            return res
+                .status(404)
+                .send('No reviews found for this apartment listing')
+        }
+
+        res.status(200).send(
+            'Reviews retrieved successfully for this apartment listing'
+        )
+
+        return res.json(results)
     })
 }
 

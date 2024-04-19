@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
 
 
-import AdminPanel from './components/AdminPanel.js';
+// import AdminPanel from './components/AdminPanel.js';
 import Navbar from './components/Navbar.js';
 import Home from './components/Home.js';
 import CreateAccount from './components/CreateAccount.js';

@@ -5,6 +5,7 @@ const apartmentListingController = require('../controllers/apartmentListingContr
 router.post('/', apartmentListingController.createApartmentListing)
 router.get('/', apartmentListingController.readApartmentListing)
 router.get('/:id', apartmentListingController.readApartmentListingById)
+router.get('/:id/reviews', apartmentListingController.getReviewsForApartment)
 router.put('/:id', apartmentListingController.updateApartmentListing)
 router.delete('/:id', apartmentListingController.deleteApartmentListing)
 
