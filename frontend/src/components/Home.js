@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Dropdown, ButtonGroup } from 'react-bootstrap';
 import backgroundImage from './blacksburglivingbackground.jpg';
+import { NavLink } from 'react-router-dom';
 
 const Home = () => {
     const [filterType, setFilterType] = useState(null);
     const [sortOrder, setSortOrder] = useState(null);
 
     const homeListings = [
-        { id: 1, price: 1000, description: 'Spacious 2-bedroom apartment in downtown Blacksburg', type: 'Apartment' },
-        { id: 2, price: 1200, description: 'Cozy 1-bedroom apartment near Virginia Tech campus', type: 'Apartment' },
-        { id: 3, price: 1500, description: 'Modern 3-bedroom apartment with large backyard', type: 'Apartment' },
-        { id: 4, price: 800, description: 'Furnished single room in dormitory building', type: 'Dorm' },
+        { id: 1, price: 1000, address: '123 Main St', type: 'Apartment' },
+        { id: 2, price: 1200, address: '456 Elm St', type: 'Apartment' },
+        { id: 3, price: 1500, address: '789 Oak St', type: 'Apartment' },
+        { id: 4, price: 800, address: '101 Maple St', type: 'Dorm' },
     ];
 
     const handleFilter = (type) => {
@@ -31,6 +32,17 @@ const Home = () => {
         filteredListings.sort((a, b) => b.price - a.price);
     }
 
+    // Label text based on the selected filter type
+    let labelText = 'Listings';
+    if (filterType === 'Apartment') {
+        labelText = 'Apartment Listings';
+    } else if (filterType === 'Dorm') {
+        labelText = 'Dorm Listings';
+    }
+
+    // Max character limit for address
+    const maxAddressLength = 20;
+
     return (
         <div id="home">
             <div style={{
@@ -47,15 +59,15 @@ const Home = () => {
             }}>
                 <h1 className='' style={{ color: 'white', fontSize: '50px' }}>Your key to Blacksburg's best living spaces.</h1>
                 <div className="mb-3" style={{ textAlign: 'center' }} >
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group" style={{ paddingTop: '20px' }}>
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" onClick={() => handleFilter(null)} />
-                        <label class="btn btn-outline-light" for="btnradio1">All</label>
+                    <div className="btn-group" role="group" aria-label="Basic radio toggle button group" style={{ paddingTop: '20px' }}>
+                        <input type="radio" className="btn-check" name="btnradio" id="btnradio1" autoComplete="off" onClick={() => handleFilter(null)} />
+                        <label className="btn btn-outline-light" htmlFor="btnradio1">All</label>
 
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" onClick={() => handleFilter('Apartment')} />
-                        <label class="btn btn-outline-light" for="btnradio2">Apartments</label>
+                        <input type="radio" className="btn-check" name="btnradio" id="btnradio2" autoComplete="off" onClick={() => handleFilter('Apartment')} />
+                        <label className="btn btn-outline-light" htmlFor="btnradio2">Apartments</label>
 
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" onClick={() => handleFilter('Dorm')} />
-                        <label class="btn btn-outline-light" for="btnradio3">Dorms</label>
+                        <input type="radio" className="btn-check" name="btnradio" id="btnradio3" autoComplete="off" onClick={() => handleFilter('Dorm')} />
+                        <label className="btn btn-outline-light" htmlFor="btnradio3">Dorms</label>
 
                     </div>
 
@@ -63,7 +75,7 @@ const Home = () => {
             </div>
 
             <Container className="mt-5">
-                <Row style={{paddingBottom: '50px'}}>
+                <Row style={{ paddingBottom: '30px' }}>
                     <Dropdown>
                         <Dropdown.Toggle variant="outline-dark" id="dropdown-basic">
                             Sorted by
@@ -75,17 +87,24 @@ const Home = () => {
                         </Dropdown.Menu>
                     </Dropdown>
                 </Row>
+                <Row style={{ paddingBottom: '20px' }}>
+                    <Col>
+                        <h3>{labelText}</h3>
+                    </Col>
+                </Row>
                 <Row>
                     {filteredListings.map(home => (
                         <Col key={home.id} md={4} className="mb-4">
-                            <div className="card" style={{ height: '350px' }}>
-                                <img src={backgroundImage} className="card-img-top" alt="Placeholder" style={{ height: '200px' }} />
-                                <div className="card-body">
-                                    <h5 className="card-title">{home.price}</h5>
-                                    <p className="card-text">{home.description}</p>
-                                    <p className="card-text"><b>{home.type}</b></p>
+                            <NavLink to={`/listing/${home.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <div className="card">
+                                    <img src={backgroundImage} className="card-img-top" alt="Placeholder" style={{ height: '200px' }} />
+                                    <div className="card-body">
+                                        <h5 className="card-title">${home.price}/month</h5>
+                                        <p className="card-text">{home.address.length > maxAddressLength ? home.address.slice(0, maxAddressLength) + '...' : home.address}</p>
+                                        <p className="card-text"><b>{home.type}</b></p>
+                                    </div>
                                 </div>
-                            </div>
+                            </NavLink>
                         </Col>
                     ))}
                 </Row>

@@ -20,7 +20,14 @@ const LoginAccount = () => {
     e.preventDefault();
     // Add your login logic here
     console.log(formData);
+    
+    // Clear the form data
+    setFormData({
+      username: '',
+      password: ''
+    });
   };
+  
 
   return (
     <div
@@ -48,7 +55,7 @@ const LoginAccount = () => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" name="password" value={formData.password} onChange={handleChange} required />
               </Form.Group>
-              <Button type="submit" variant="primary" block style={{marginTop: '20px'}}>Login</Button>
+              <Button type="submit" variant="primary" style={{marginTop: '20px'}}>Login</Button>
             </Form>
           </Card.Body>
         </Card>
