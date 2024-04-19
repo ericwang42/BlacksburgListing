@@ -52,6 +52,10 @@ exports.readResident = (req, res) => {
             return res.status(500).send(err)
         }
 
+        if (results.length == 0) {
+            return res.status(404).send('No residents found')
+        }
+
         res.status(200).send('Residents retrieved successfully')
         return res.json(results)
     })
@@ -65,6 +69,10 @@ exports.readResidentById = (req, res) => {
     db.query(sql, [id], (err, result) => {
         if (err) {
             return res.status(500).send(err)
+        }
+
+        if (result.length == 0) {
+            return res.status(404).send('No resident found with this id')
         }
 
         res.status(200).send('Resident retrieved successfully')

@@ -40,6 +40,10 @@ exports.readReview = (req, res) => {
             return res.status(500).send(err)
         }
 
+        if (results.length == 0) {
+            return res.status(404).send('No reviews found')
+        }
+
         res.status(200).send('Reviews retrieved successfully')
         return res.json(results)
     })
@@ -55,8 +59,38 @@ exports.readReviewById = (req, res) => {
             return res.status(500).send(err)
         }
 
+        if (results.length == 0) {
+            return res.status(404).send('No review found with this id')
+        }
+
         res.status(200).send('Review retrieved successfully')
         return res.json(result)
+    })
+}
+
+exports.getReviewAndResident = (req, res) => {
+    const { reviewId } = req.params
+
+    const sql = `
+        SELECT r.review_id, r.rating, r.review_description, r.reviewer_id, br.first_name, br.last_name
+        FROM Review r
+        JOIN Blacksburg_Resident br ON r.reviewer_id = br.resident_id
+        WHERE r.review_id = ?
+    `
+
+    db.query(sql, [reviewId], (err, results) => {
+        if (err) {
+            return res.status(500).send(err)
+        }
+
+        if (results.length == 0) {
+            return res
+                .status(404)
+                .send('Review not found or resident details missing')
+        }
+
+        res.status(200).send('Review retrieved successfully')
+        return res.json(results)
     })
 }
 

@@ -170,10 +170,7 @@ const AdminPanel = () => {
                             </Col>
                         </Row>
                     </Form>
-
-
                     <hr />
-
                     <Form onSubmit={handleUpdateSubmit}>
                         <h3>UPDATE</h3>
                         <Row>
