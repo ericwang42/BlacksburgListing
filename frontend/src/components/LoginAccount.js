@@ -32,11 +32,11 @@ const LoginAccount = () => {
         backgroundImage: `url(${loginBackground})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        paddingTop: '50px'
+        paddingTop: '150px'
       }}
     >
       <div className="container d-flex justify-content-center align-items-center">
-        <Card style={{ width: '400px' }}>
+        <Card className = 'account-card' style={{ width: '400px', borderRadius: '5px'}}>
           <Card.Body>
             <h2 className="text-center">Login</h2>
             <Form onSubmit={handleSubmit}>
@@ -44,11 +44,11 @@ const LoginAccount = () => {
                 <Form.Label>Username</Form.Label>
                 <Form.Control type="text" name="username" value={formData.username} onChange={handleChange} required />
               </Form.Group>
-              <Form.Group>
+              <Form.Group style={{marginTop: '20px'}}>
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" name="password" value={formData.password} onChange={handleChange} required />
               </Form.Group>
-              <Button type="submit" variant="primary" block>Login</Button>
+              <Button type="submit" variant="primary" block style={{marginTop: '20px'}}>Login</Button>
             </Form>
           </Card.Body>
         </Card>

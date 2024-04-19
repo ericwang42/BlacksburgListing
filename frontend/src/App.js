@@ -17,7 +17,7 @@ import LoginAccount from './components/LoginAccount.js';
 function App() {
   return (
     <Router>
-      <div>
+      <div className="josefin-sans">
         <Navbar />
         <Routes>
           <Route path="/" element={<Home/>} />

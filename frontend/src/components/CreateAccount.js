@@ -34,7 +34,7 @@ const CreateAccount = () => {
   };
 
   return (
-    <div
+    <div class = 'blur-this'
       id="create-account"
       style={{
         minHeight: '100vh',
@@ -42,10 +42,11 @@ const CreateAccount = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         paddingTop: '50px'
+        
       }}
     >
       <div className="container">
-        <Card style={{ width: '400px', margin: 'auto'}}>
+        <Card className = 'account-card' style={{ width: '400px', margin: 'auto'}}>
           <Card.Body>
             <h2 className="text-center">Register</h2>
             <Form onSubmit={handleSubmit}>
@@ -65,13 +66,13 @@ const CreateAccount = () => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
               </Form.Group>
-              <Form.Group>
+              <Form.Group>  
                 <Form.Label>Confirm Password</Form.Label>
                 <Form.Control type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />
               </Form.Group>
               <Form.Group>
                 <p>Select User Type:</p>
-                <div className="btn-group btn-group-toggle" data-toggle="buttons" style>
+                <div className="btn-group btn-group-toggle" data-toggle="buttons">
                   <Button className={`btn ${formData.userType === 'landlord' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => handleUserTypeChange('landlord')}>Landlord</Button>
                   <Button className={`btn ${formData.userType === 'resident' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => handleUserTypeChange('resident')}>Resident</Button>
                 </div>
