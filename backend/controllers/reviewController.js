@@ -44,8 +44,8 @@ exports.readReview = (req, res) => {
             return res.status(404).send('No reviews found')
         }
 
-        res.status(200).send('Reviews retrieved successfully')
-        return res.json(results)
+        // res.status(200).send('Reviews retrieved successfully')
+        return res.status(200).json(results)
     })
 }
 
@@ -63,8 +63,8 @@ exports.readReviewById = (req, res) => {
             return res.status(404).send('No review found with this id')
         }
 
-        res.status(200).send('Review retrieved successfully')
-        return res.json(result)
+        // res.status(200).send('Review retrieved successfully')
+        return res.status(200).json(result)
     })
 }
 

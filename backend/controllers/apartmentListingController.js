@@ -54,8 +54,8 @@ exports.readApartmentListing = (req, res) => {
             return res.status(404).send('No apartment listings found')
         }
 
-        res.status(200).send('Apartment listings retrieved successfully')
-        return res.json(results)
+        // res.status(200).send('Apartment listings retrieved successfully')
+        return res.status(200).json(results)
     })
 }
 
@@ -75,8 +75,8 @@ exports.readApartmentListingById = (req, res) => {
                 .send('No apartment listing found with this id')
         }
 
-        res.status(200).send('Apartment listing retrieved successfully')
-        return res.json(result)
+        // res.status(200).send('Apartment listing retrieved successfully')
+        return res.status(200).json(result)
     })
 }
 

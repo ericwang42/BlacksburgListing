@@ -2,26 +2,56 @@ const db = require('../database')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
+async function usernameExists(username, db) {
+    const queries = [
+        `SELECT 1 FROM Blacksburg_Resident WHERE username = ? LIMIT 1`,
+        `SELECT 1 FROM Apartment_Leaser WHERE username = ? LIMIT 1`,
+        `SELECT 1 FROM Admin WHERE username = ? LIMIT 1`,
+    ]
+
+    for (let query of queries) {
+        const [results] = await db.promise().query(query, [username])
+
+        if (results.length > 0) {
+            return true
+        }
+    }
+
+    return false
+}
+
 exports.registerAdmin = (req, res) => {
     const { username, password } = req.body
 
-    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-        if (err) {
-            return res.status(500).send('Error hashing password')
-        }
-
-        const sql = `INSERT INTO Admin (username, password_hash) VALUES (?, ?)`
-
-        db.query(sql, [username, hashedPassword], (err, result) => {
-            if (err) {
-                return res.status(500).send(err)
+    usernameExists(username, db)
+        .then((exists) => {
+            if (exists) {
+                return res.status(409).send('Username already in use')
             }
 
-            return res
-                .status(201)
-                .send(`Admin created successfully with ID: ${result.insertId}`)
+            bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+                if (err) {
+                    return res.status(500).send('Error hashing password')
+                }
+
+                const sql = `INSERT INTO Admin (username, password_hash) VALUES (?, ?)`
+
+                db.query(sql, [username, hashedPassword], (err, result) => {
+                    if (err) {
+                        return res.status(500).send(err)
+                    }
+
+                    return res
+                        .status(201)
+                        .send(
+                            `Admin created successfully with ID: ${result.insertId}`
+                        )
+                })
+            })
         })
-    })
+        .catch((err) => {
+            return res.status(500).send(`Server error: ${err}`)
+        })
 }
 
 exports.readAdmin = (req, res) => {
@@ -36,8 +66,8 @@ exports.readAdmin = (req, res) => {
             return res.status(404).send('No admins found')
         }
 
-        res.status(200).send('Admins retrieved successfully')
-        return res.json(results)
+        // res.status(200).send('Admins retrieved successfully')
+        return res.status(200).json(results)
     })
 }
 
@@ -55,8 +85,8 @@ exports.readAdminById = (req, res) => {
             return res.status(404).send('No admin found with this id')
         }
 
-        res.status(200).send('Admin retrieved successfully')
-        return res.json(result)
+        // res.status(200).send('Admin retrieved successfully')
+        return res.status(200).json(result)
     })
 }
 
@@ -94,33 +124,5 @@ exports.deleteAdmin = (req, res) => {
         }
 
         return res.status(200).send('Admin deleted successfully')
-    })
-}
-
-exports.loginAdmin = (req, res) => {
-    const { username, password } = req.body
-
-    const sql = `SELECT password_hash FROM Admin WHERE username = ?`
-
-    db.query(sql, [username], (err, results) => {
-        if (err) {
-            return res.status(500).send('Server error')
-        }
-
-        if (results.length === 0) {
-            return res.status(404).send('Admin not found')
-        }
-
-        bcrypt.compare(password, results[0].password_hash, (err, isMatch) => {
-            if (err) {
-                return res.status(500).send('Error verifying password')
-            }
-
-            if (isMatch) {
-                return res.status(200).send('Correct password')
-            } else {
-                return res.status(401).send('Incorrect password')
-            }
-        })
     })
 }

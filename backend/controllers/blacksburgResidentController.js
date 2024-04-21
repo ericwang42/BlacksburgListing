@@ -2,6 +2,24 @@ const db = require('../database')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
+async function usernameExists(username, db) {
+    const queries = [
+        `SELECT 1 FROM Blacksburg_Resident WHERE username = ? LIMIT 1`,
+        `SELECT 1 FROM Apartment_Leaser WHERE username = ? LIMIT 1`,
+        `SELECT 1 FROM Admin WHERE username = ? LIMIT 1`,
+    ]
+
+    for (let query of queries) {
+        const [results] = await db.promise().query(query, [username])
+
+        if (results.length > 0) {
+            return true
+        }
+    }
+
+    return false
+}
+
 exports.registerResident = (req, res) => {
     const {
         first_name,
@@ -12,36 +30,46 @@ exports.registerResident = (req, res) => {
         password_hash,
     } = req.body
 
-    bcrypt.hash(password_hash, saltRounds, (err, hashed_password) => {
-        if (err) {
-            return res.status(500).send('Error hashing password')
-        }
+    usernameExists(username, db)
+        .then((exists) => {
+            if (exists) {
+                return res.status(409).send('Username already in use')
+            }
 
-        const sql = `INSERT INTO Blacksburg_Resident (first_name, last_name, date_of_birth, school_year, username, password_hash) VALUES (?, ?, ?, ?, ?, ?)`
-
-        db.query(
-            sql,
-            [
-                first_name,
-                last_name,
-                date_of_birth,
-                school_year,
-                username,
-                hashed_password,
-            ],
-            (err, result) => {
+            bcrypt.hash(password_hash, saltRounds, (err, hashed_password) => {
                 if (err) {
-                    return res.status(500).send(err)
+                    return res.status(500).send('Error hashing password')
                 }
 
-                return res
-                    .status(201)
-                    .send(
-                        `Resident registered successfully with ID: ${result.insertId}`
-                    )
-            }
-        )
-    })
+                const sql = `INSERT INTO Blacksburg_Resident (first_name, last_name, date_of_birth, school_year, username, password_hash) VALUES (?, ?, ?, ?, ?, ?)`
+
+                db.query(
+                    sql,
+                    [
+                        first_name,
+                        last_name,
+                        date_of_birth,
+                        school_year,
+                        username,
+                        hashed_password,
+                    ],
+                    (err, result) => {
+                        if (err) {
+                            return res.status(500).send(err)
+                        }
+
+                        return res
+                            .status(201)
+                            .send(
+                                `Resident registered successfully with ID: ${result.insertId}`
+                            )
+                    }
+                )
+            })
+        })
+        .catch((err) => {
+            return res.status(500).send(`Server error: ${err}`)
+        })
 }
 
 exports.readResident = (req, res) => {
@@ -56,8 +84,8 @@ exports.readResident = (req, res) => {
             return res.status(404).send('No residents found')
         }
 
-        res.status(200).send('Residents retrieved successfully')
-        return res.json(results)
+        // res.status(200).send('Residents retrieved successfully')
+        return res.status(200).json(results)
     })
 }
 
@@ -75,8 +103,8 @@ exports.readResidentById = (req, res) => {
             return res.status(404).send('No resident found with this id')
         }
 
-        res.status(200).send('Resident retrieved successfully')
-        return res.json(result)
+        // res.status(200).send('Resident retrieved successfully')
+        return res.status(200).json(result)
     })
 }
 
@@ -118,34 +146,6 @@ exports.deleteResident = (req, res) => {
         }
 
         return res.status(200).send('Resident deleted successfully')
-    })
-}
-
-exports.loginResident = (req, res) => {
-    const { username, password } = req.body
-
-    const sql = `SELECT password_hash FROM Blacksburg_Resident WHERE username = ?`
-
-    db.query(sql, [username], (err, results) => {
-        if (err) {
-            return res.status(500).send('Server error')
-        }
-
-        if (results.length === 0) {
-            return res.status(404).send('User not found')
-        }
-
-        bcrypt.compare(password, results[0].password_hash, (err, isMatch) => {
-            if (err) {
-                return res.status(500).send('Error verifying password')
-            }
-
-            if (isMatch) {
-                return res.status(200).send('Correct password')
-            } else {
-                return res.status(401).send('Incorrect password')
-            }
-        })
     })
 }
 
