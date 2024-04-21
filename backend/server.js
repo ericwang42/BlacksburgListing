@@ -12,6 +12,7 @@ const apartmentListingRoutes = require('./routes/apartmentListingRoutes')
 const dormListingRoutes = require('./routes/dormListingRoutes')
 const reviewRoutes = require('./routes/reviewRoutes')
 const adminRoutes = require('./routes/adminRoutes')
+const loginRoutes = require('./routes/loginRoutes')
 
 app.use('/api/Blacksburg_Resident', blacksburgResidentRoutes)
 app.use('/api/Apartment_Leaser', apartmentLeaserRoutes)
@@ -19,6 +20,7 @@ app.use('/api/Apartment_Listing', apartmentListingRoutes)
 app.use('/api/Dorm_Listing', dormListingRoutes)
 app.use('/api/Review', reviewRoutes)
 app.use('/api/Admin', adminRoutes)
+app.use('/api/Login', loginRoutes)
 
 // checks for any unhandled requests
 app.use('*', (req, res) => {

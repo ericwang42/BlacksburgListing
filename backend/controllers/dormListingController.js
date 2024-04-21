@@ -52,8 +52,8 @@ exports.readDormListing = (req, res) => {
             return res.status(404).send('No dorm listings found')
         }
 
-        res.status(200).send('Dorm listings retrieved successfully')
-        return res.json(results)
+        // res.status(200).send('Dorm listings retrieved successfully')
+        return res.status(200).json(results)
     })
 }
 
@@ -71,8 +71,8 @@ exports.readDormListingById = (req, res) => {
             return res.status(404).send('No dorm listing found with this id')
         }
 
-        res.status(200).send('Dorm listing retrieved successfully')
-        return res.json(result)
+        // res.status(200).send('Dorm listing retrieved successfully')
+        return res.status(200).json(result)
     })
 }
 
