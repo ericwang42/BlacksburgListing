@@ -1,23 +1,36 @@
-const db = require('../database')
-const bcrypt = require('bcrypt')
+const db = require("../database")
+const bcrypt = require("bcrypt")
 const saltRounds = 10
 
-async function usernameExists(username, db) {
+function usernameExists(username, db, callback) {
     const queries = [
         `SELECT 1 FROM Blacksburg_Resident WHERE username = ? LIMIT 1`,
         `SELECT 1 FROM Apartment_Leaser WHERE username = ? LIMIT 1`,
         `SELECT 1 FROM Admin WHERE username = ? LIMIT 1`,
     ]
 
-    for (let query of queries) {
-        const [results] = await db.promise().query(query, [username])
+    let exists = false
+    let queriesProcessed = 0
 
-        if (results.length > 0) {
-            return true
-        }
-    }
+    queries.forEach((query) => {
+        db.query(query, [username], (err, results) => {
+            if (err) {
+                db.rollback(() => {
+                    throw err
+                })
+                return
+            }
 
-    return false
+            if (results.length > 0) {
+                exists = true
+            }
+
+            queriesProcessed++
+            if (queriesProcessed === queries.length) {
+                callback(exists)
+            }
+        })
+    })
 }
 
 exports.registerLeaser = (req, res) => {
@@ -25,20 +38,30 @@ exports.registerLeaser = (req, res) => {
         first_name,
         last_name,
         date_of_birth,
-        school_year,
+        school_year = null,
         username,
         password_hash,
     } = req.body
 
-    usernameExists(username, db)
-        .then((exists) => {
+    db.beginTransaction((err) => {
+        if (err) {
+            return res.status(500).send("Failed to start transaction")
+        }
+
+        usernameExists(username, db, (exists) => {
             if (exists) {
-                return res.status(409).send('Username already in use')
+                db.rollback(() =>
+                    res.status(409).send("Username already in use")
+                )
+                return
             }
 
             bcrypt.hash(password_hash, saltRounds, (err, hashed_password) => {
                 if (err) {
-                    return res.status(500).send('Error hashing password')
+                    db.rollback(() =>
+                        res.status(500).send("Error hashing password")
+                    )
+                    return
                 }
 
                 const sql = `INSERT INTO Apartment_Leaser (first_name, last_name, date_of_birth, school_year, username, password_hash) VALUES (?, ?, ?, ?, ?, ?)`
@@ -54,20 +77,61 @@ exports.registerLeaser = (req, res) => {
                         hashed_password,
                     ],
                     (err, result) => {
-                        if (err) return res.status(500).send(err)
+                        if (err) {
+                            db.rollback(() => res.status(500).send(err))
+                            return
+                        }
 
-                        return res
-                            .status(201)
-                            .send(
+                        db.commit((err) => {
+                            if (err) {
+                                db.rollback(() =>
+                                    res
+                                        .status(500)
+                                        .send("Failed to commit transaction")
+                                )
+                                return
+                            }
+
+                            res.status(201).send(
                                 `Leaser registered successfully with ID: ${result.insertId}`
                             )
+                        })
                     }
                 )
             })
         })
-        .catch((err) => {
-            return res.status(500).send(`Server error: ${err}`)
+    })
+}
+
+function usernameExists(username, db, callback) {
+    const queries = [
+        `SELECT 1 FROM Blacksburg_Resident WHERE username = ? LIMIT 1`,
+        `SELECT 1 FROM Apartment_Leaser WHERE username = ? LIMIT 1`,
+        `SELECT 1 FROM Admin WHERE username = ? LIMIT 1`,
+    ]
+
+    let exists = false
+    let queriesProcessed = 0
+
+    queries.forEach((query) => {
+        db.query(query, [username], (err, results) => {
+            if (err) {
+                db.rollback(() => {
+                    throw err
+                })
+                return
+            }
+
+            if (results.length > 0) {
+                exists = true
+            }
+
+            queriesProcessed++
+            if (queriesProcessed === queries.length) {
+                callback(exists)
+            }
         })
+    })
 }
 
 exports.readLeaser = (req, res) => {
@@ -79,10 +143,9 @@ exports.readLeaser = (req, res) => {
         }
 
         if (results.length == 0) {
-            return res.status(404).send('No leasers found')
+            return res.status(404).send("No leasers found")
         }
 
-        // res.status(200).send('Leasers retrieved successfully')
         return res.status(200).json(results)
     })
 }
@@ -98,10 +161,9 @@ exports.readLeaserById = (req, res) => {
         }
 
         if (result.length == 0) {
-            return res.status(404).send('No leaser found with this id')
+            return res.status(404).send("No leaser found with this id")
         }
 
-        // res.status(200).send('Leaser retrieved successfully')
         return res.status(200).json(result)
     })
 }
@@ -121,10 +183,10 @@ exports.updateLeaser = (req, res) => {
             }
 
             if (result.affectedRows == 0) {
-                return res.status(404).send('Leaser not found')
+                return res.status(404).send("Leaser not found")
             }
 
-            return res.status(200).send('Leaser updated successfully')
+            return res.status(200).send("Leaser updated successfully")
         }
     )
 }
@@ -140,10 +202,10 @@ exports.deleteLeaser = (req, res) => {
         }
 
         if (result.affectedRows == 0) {
-            return res.status(404).send('Leaser not found')
+            return res.status(404).send("Leaser not found")
         }
 
-        return res.status(200).send('Leaser deleted successfully')
+        return res.status(200).send("Leaser deleted successfully")
     })
 }
 
@@ -154,11 +216,11 @@ exports.changeLeaserPassword = (req, res) => {
 
     db.query(sql, [username], (err, results) => {
         if (err) {
-            return res.status(500).send('Server error')
+            return res.status(500).send("Server error")
         }
 
         if (results.length === 0) {
-            return res.status(404).send('User not found')
+            return res.status(404).send("User not found")
         }
 
         bcrypt.compare(
@@ -166,10 +228,10 @@ exports.changeLeaserPassword = (req, res) => {
             results[0].password_hash,
             (err, isMatch) => {
                 if (err) {
-                    return res.status(500).send('Error verifying password')
+                    return res.status(500).send("Error verifying password")
                 }
                 if (!isMatch) {
-                    return res.status(401).send('Incorrect old password')
+                    return res.status(401).send("Incorrect old password")
                 }
 
                 bcrypt.hash(
@@ -179,7 +241,7 @@ exports.changeLeaserPassword = (req, res) => {
                         if (err) {
                             return res
                                 .status(500)
-                                .send('Error hashing new password')
+                                .send("Error hashing new password")
                         }
 
                         const updateSql = `UPDATE Apartment_Leaser SET password_hash = ? WHERE username = ?`
@@ -191,18 +253,18 @@ exports.changeLeaserPassword = (req, res) => {
                                 if (err) {
                                     return res
                                         .status(500)
-                                        .send('Server error updating password')
+                                        .send("Server error updating password")
                                 }
 
                                 if (result.affectedRows === 0) {
                                     return res
                                         .status(404)
-                                        .send('User not found during update')
+                                        .send("User not found during update")
                                 }
 
                                 return res
                                     .status(200)
-                                    .send('Password changed successfully')
+                                    .send("Password changed successfully")
                             }
                         )
                     }

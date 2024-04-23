@@ -1,40 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import AddReview from './AddReview';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Image } from "react-bootstrap";
+import axios from "axios";
+import AddReview from "./AddReview";
+import backgroundImage from "../assets/blacksburglivingbackground.jpg"; // Assuming the same placeholder image as before
+import { useParams } from "react-router-dom";
 
-const ListingDetails = ({ id, type }) => {
+
+const ListingDetails = () => {
+    const { id, type } = useParams();
     const [listingData, setListingData] = useState(null);
-    const [reviews, setReviews] = useState([]); // State to store reviews
-
-    type = 'Apartment';
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-        const fetchData = () => {
-            console.log("entered");
-            if (type === 'Apartment') {
-                console.log("entered");
-                setListingData({
-                    apartment_id: 1,
-                    street_address: '123 Main St',
-                    apt_number: 'Apt 101',
-                    city: 'Blacksburg',
-                    state: 'VA',
-                    zip_code: '24060',
-                    leaser_name: 'John Doe',
-                    leaser_no: '123-456-7890',
-                });
-            } else if (type === 'Dorm') {
-                setListingData({
-                    dorm_id: 1,
-                    street_address: '456 Elm St',
-                    room_number: 'Room 201',
-                    city: 'Blacksburg',
-                    state: 'VA',
-                    zip_code: '24061',
-                    dorm_name: 'Tech Hall',
-                });
+        const fetchData = async () => {
+            try {
+                const endpoint = type === "Apartment" ? "Apartment_Listing" : "Dorm_Listing";
+                const url = `http://localhost:3001/api/${endpoint}/${id}`;
+                const response = await axios.get(url);
+                setListingData(response.data);
+            } catch (error) {
+                console.error("Failed to fetch listing data:", error);
             }
         };
+
         fetchData();
     }, [id, type]);
 
@@ -44,45 +32,38 @@ const ListingDetails = ({ id, type }) => {
 
     // Function to add a review to the list
     const addReview = (review) => {
-        setReviews([...reviews, review]); // Add new review to the existing list
+        setReviews([...reviews, review]);
     };
 
     return (
-        <div id="listing-details">
-            <Container>
+        <div id='listing-details'>
+            <Image src={backgroundImage} fluid style={{ width: "100%", height: "300px", objectFit: "cover" }} />
+            <Container className="mt-3">
                 <Row>
                     <Col>
                         <h1>Listing Details</h1>
-                        {type === 'Apartment' && (
+                        <p>Street Address: {listingData.street_address}</p>
+                        <p>{type === "Apartment" ? `Apt Number: ${listingData.apt_number}` : `Room Number: ${listingData.room_number}`}</p>
+                        <p>City: {listingData.city}</p>
+                        <p>State: {listingData.state}</p>
+                        <p>Zip Code: {listingData.zip_code}</p>
+                        {type === "Apartment" ? (
                             <>
-                                <p>Street Address: {listingData.street_address}</p>
-                                <p>Apt Number: {listingData.apt_number}</p>
-                                <p>City: {listingData.city}</p>
-                                <p>State: {listingData.state}</p>
-                                <p>Zip Code: {listingData.zip_code}</p>
                                 <p>Leaser Name: {listingData.leaser_name}</p>
                                 <p>Leaser Number: {listingData.leaser_no}</p>
                             </>
-                        )}
-                        {type === 'Dorm' && (
-                            <>
-                                <p>Street Address: {listingData.street_address}</p>
-                                <p>Room Number: {listingData.room_number}</p>
-                                <p>City: {listingData.city}</p>
-                                <p>State: {listingData.state}</p>
-                                <p>Zip Code: {listingData.zip_code}</p>
-                                <p>Dorm Name: {listingData.dorm_name}</p>
-                            </>
+                        ) : (
+                            <p>Dorm Name: {listingData.dorm_name}</p>
                         )}
                     </Col>
                 </Row>
             </Container>
-            <Container>
+            <Container className="mt-4">
                 <Row>
                     <Col>
                         <h2>Reviews</h2>
                         {reviews.length === 0 ? (
-                            <p>Nothing to show here.</p>
+                            <p>No reviews yet. Be the first to review!</p>
                         ) : (
                             reviews.map((review, index) => (
                                 <div key={index}>

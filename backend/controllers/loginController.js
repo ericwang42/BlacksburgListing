@@ -1,54 +1,71 @@
-const db = require('../database')
-const bcrypt = require('bcrypt')
+const db = require("../database")
+const bcrypt = require("bcrypt")
 
 exports.login = (req, res) => {
     const { username, password } = req.body
-
     const queries = [
         {
-            query: `SELECT resident_id, password_hash FROM Blacksburg_Resident WHERE username = ? LIMIT 1`,
-            type: 'Blacksburg_Resident',
-            id: 'resident_id',
+            query: `SELECT resident_id as user_id, password_hash FROM Blacksburg_Resident WHERE username = ? LIMIT 1`,
+            type: "Blacksburg_Resident",
         },
         {
-            query: `SELECT leaser_id, password_hash FROM Apartment_Leaser WHERE username = ? LIMIT 1`,
-            type: 'Apartment_Leaser',
-            id: 'leaser_id',
+            query: `SELECT leaser_id as user_id, password_hash FROM Apartment_Leaser WHERE username = ? LIMIT 1`,
+            type: "Apartment_Leaser",
         },
         {
-            query: `SELECT admin_id, password_hash FROM Admin WHERE username = ? LIMIT 1`,
-            type: 'Admin',
-            id: 'admin_id',
+            query: `SELECT admin_id as user_id, password_hash FROM Admin WHERE username = ? LIMIT 1`,
+            type: "Admin",
         },
     ]
-    
-    (async () => {
+
+    const checkUser = async (queryEntry, doneCallback) => {
+        db.query(queryEntry.query, [username], (err, results) => {
+            if (err) {
+                return doneCallback(err)
+            }
+
+            if (results.length === 0) {
+                return doneCallback()
+            }
+
+            bcrypt.compare(password, results[0].password_hash, (err, match) => {
+                if (err) {
+                    return doneCallback(err)
+                }
+
+                if (match) {
+                    return doneCallback(null, {
+                        user_type: queryEntry.type,
+                        user_id: results[0].user_id,
+                    })
+                } else {
+                    return doneCallback()
+                }
+            })
+        })
+    }
+
+    ;(async function processQueries() {
         for (let entry of queries) {
             try {
-                const [results] = await db
-                    .promise()
-                    .query(entry.query, [username])
+                const result = await new Promise((resolve, reject) => {
+                    checkUser(entry, (err, success) => {
+                        if (err) {
+                            reject(err)
+                        } else {
+                            resolve(success)
+                        }
+                    })
+                })
 
-                if (results.length > 0) {
-                    const match = await bcrypt.compare(
-                        password,
-                        results[0].password_hash
-                    )
-
-                    if (match) {
-                        return res.status(200).json({
-                            user_type: entry.type,
-                            user_id: results[0][entry.id],
-                        })
-                    } else {
-                        return res.status(401).send('Incorrect password')
-                    }
+                if (result) {
+                    return res.json(result)
                 }
             } catch (err) {
-                return res.status(500).send(`Server error: ${err}`)
+                return res.status(500).send("Server error")
             }
         }
-
-        return res.status(404).send('User not found')
+        
+        res.status(401).send("Invalid credentials")
     })()
 }

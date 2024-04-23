@@ -1,4 +1,4 @@
-const db = require('../database')
+const db = require("../database")
 
 exports.createApartmentListing = (req, res) => {
     const {
@@ -51,10 +51,9 @@ exports.readApartmentListing = (req, res) => {
         }
 
         if (results.length == 0) {
-            return res.status(404).send('No apartment listings found')
+            return res.status(404).send("No apartment listings found")
         }
 
-        // res.status(200).send('Apartment listings retrieved successfully')
         return res.status(200).json(results)
     })
 }
@@ -72,10 +71,9 @@ exports.readApartmentListingById = (req, res) => {
         if (result.length == 0) {
             return res
                 .status(404)
-                .send('No apartment listing found with this id')
+                .send("No apartment listing found with this id")
         }
 
-        // res.status(200).send('Apartment listing retrieved successfully')
         return res.status(200).json(result)
     })
 }
@@ -97,11 +95,11 @@ exports.getReviewsForApartment = (req, res) => {
         if (results.length == 0) {
             return res
                 .status(404)
-                .send('No reviews found for this apartment listing')
+                .send("No reviews found for this apartment listing")
         }
 
         res.status(200).send(
-            'Reviews retrieved successfully for this apartment listing'
+            "Reviews retrieved successfully for this apartment listing"
         )
 
         return res.json(results)
@@ -144,12 +142,12 @@ exports.updateApartmentListing = (req, res) => {
             }
 
             if (result.affectedRows == 0) {
-                return res.status(404).send('Apartment listing not found')
+                return res.status(404).send("Apartment listing not found")
             }
 
             return res
                 .status(200)
-                .send('Apartment listing updated successfully')
+                .send("Apartment listing updated successfully")
         }
     )
 }
@@ -165,9 +163,9 @@ exports.deleteApartmentListing = (req, res) => {
         }
 
         if (result.affectedRows == 0) {
-            return res.status(404).send('Apartment listing not found')
+            return res.status(404).send("Apartment listing not found")
         }
 
-        return res.status(200).send('Apartment listing deleted successfully')
+        return res.status(200).send("Apartment listing deleted successfully")
     })
 }

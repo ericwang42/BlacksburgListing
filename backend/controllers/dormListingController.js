@@ -1,4 +1,4 @@
-const db = require('../database')
+const db = require("../database")
 
 exports.createDormListing = (req, res) => {
     const {
@@ -49,10 +49,9 @@ exports.readDormListing = (req, res) => {
         }
 
         if (results.length == 0) {
-            return res.status(404).send('No dorm listings found')
+            return res.status(404).send("No dorm listings found")
         }
 
-        // res.status(200).send('Dorm listings retrieved successfully')
         return res.status(200).json(results)
     })
 }
@@ -68,10 +67,9 @@ exports.readDormListingById = (req, res) => {
         }
 
         if (result.length == 0) {
-            return res.status(404).send('No dorm listing found with this id')
+            return res.status(404).send("No dorm listing found with this id")
         }
 
-        // res.status(200).send('Dorm listing retrieved successfully')
         return res.status(200).json(result)
     })
 }
@@ -93,11 +91,11 @@ exports.getReviewsForDorm = (req, res) => {
         if (results.length == 0) {
             return res
                 .status(404)
-                .send('No reviews found for this dorm listing')
+                .send("No reviews found for this dorm listing")
         }
 
         res.status(200).send(
-            'Reviews retrieved successfully for this dorm listing'
+            "Reviews retrieved successfully for this dorm listing"
         )
 
         return res.json(results)
@@ -138,10 +136,10 @@ exports.updateDormListing = (req, res) => {
             }
 
             if (result.affectedRows == 0) {
-                return res.status(404).send('Dorm listing not found')
+                return res.status(404).send("Dorm listing not found")
             }
 
-            return res.status(200).send('Dorm listing updated successfully')
+            return res.status(200).send("Dorm listing updated successfully")
         }
     )
 }
@@ -157,9 +155,9 @@ exports.deleteDormListing = (req, res) => {
         }
 
         if (result.affectedRows == 0) {
-            return res.status(404).send('Dorm listing not found')
+            return res.status(404).send("Dorm listing not found")
         }
 
-        return res.status(200).send('Dorm listing deleted successfully')
+        return res.status(200).send("Dorm listing deleted successfully")
     })
 }

@@ -1,23 +1,36 @@
-const db = require('../database')
-const bcrypt = require('bcrypt')
+const db = require("../database")
+const bcrypt = require("bcrypt")
 const saltRounds = 10
 
-async function usernameExists(username, db) {
+function usernameExists(username, db, callback) {
     const queries = [
         `SELECT 1 FROM Blacksburg_Resident WHERE username = ? LIMIT 1`,
         `SELECT 1 FROM Apartment_Leaser WHERE username = ? LIMIT 1`,
         `SELECT 1 FROM Admin WHERE username = ? LIMIT 1`,
     ]
 
-    for (let query of queries) {
-        const [results] = await db.promise().query(query, [username])
+    let exists = false
+    let queriesProcessed = 0
 
-        if (results.length > 0) {
-            return true
-        }
-    }
+    queries.forEach((query) => {
+        db.query(query, [username], (err, results) => {
+            if (err) {
+                db.rollback(() => {
+                    throw err
+                })
+                return
+            }
 
-    return false
+            if (results.length > 0) {
+                exists = true
+            }
+
+            queriesProcessed++
+            if (queriesProcessed === queries.length) {
+                callback(exists)
+            }
+        })
+    })
 }
 
 exports.registerResident = (req, res) => {
@@ -25,20 +38,30 @@ exports.registerResident = (req, res) => {
         first_name,
         last_name,
         date_of_birth,
-        school_year,
+        school_year = null,
         username,
         password_hash,
     } = req.body
 
-    usernameExists(username, db)
-        .then((exists) => {
+    db.beginTransaction((err) => {
+        if (err) {
+            return res.status(500).send("Failed to start transaction")
+        }
+
+        usernameExists(username, db, (exists) => {
             if (exists) {
-                return res.status(409).send('Username already in use')
+                db.rollback(() =>
+                    res.status(409).send("Username already in use")
+                )
+                return
             }
 
             bcrypt.hash(password_hash, saltRounds, (err, hashed_password) => {
                 if (err) {
-                    return res.status(500).send('Error hashing password')
+                    db.rollback(() =>
+                        res.status(500).send("Error hashing password")
+                    )
+                    return
                 }
 
                 const sql = `INSERT INTO Blacksburg_Resident (first_name, last_name, date_of_birth, school_year, username, password_hash) VALUES (?, ?, ?, ?, ?, ?)`
@@ -55,21 +78,29 @@ exports.registerResident = (req, res) => {
                     ],
                     (err, result) => {
                         if (err) {
-                            return res.status(500).send(err)
+                            db.rollback(() => res.status(500).send(err))
+                            return
                         }
 
-                        return res
-                            .status(201)
-                            .send(
+                        db.commit((err) => {
+                            if (err) {
+                                db.rollback(() =>
+                                    res
+                                        .status(500)
+                                        .send("Failed to commit transaction")
+                                )
+                                return
+                            }
+
+                            res.status(201).send(
                                 `Resident registered successfully with ID: ${result.insertId}`
                             )
+                        })
                     }
                 )
             })
         })
-        .catch((err) => {
-            return res.status(500).send(`Server error: ${err}`)
-        })
+    })
 }
 
 exports.readResident = (req, res) => {
@@ -81,10 +112,9 @@ exports.readResident = (req, res) => {
         }
 
         if (results.length == 0) {
-            return res.status(404).send('No residents found')
+            return res.status(404).send("No residents found")
         }
 
-        // res.status(200).send('Residents retrieved successfully')
         return res.status(200).json(results)
     })
 }
@@ -100,10 +130,9 @@ exports.readResidentById = (req, res) => {
         }
 
         if (result.length == 0) {
-            return res.status(404).send('No resident found with this id')
+            return res.status(404).send("No resident found with this id")
         }
 
-        // res.status(200).send('Resident retrieved successfully')
         return res.status(200).json(result)
     })
 }
@@ -123,10 +152,10 @@ exports.updateResident = (req, res) => {
             }
 
             if (result.affectedRows == 0) {
-                return res.status(404).send('Resident not found')
+                return res.status(404).send("Resident not found")
             }
 
-            return res.status(200).send('Resident updated successfully')
+            return res.status(200).send("Resident updated successfully")
         }
     )
 }
@@ -142,10 +171,10 @@ exports.deleteResident = (req, res) => {
         }
 
         if (result.affectedRows == 0) {
-            return res.status(404).send('Resident not found')
+            return res.status(404).send("Resident not found")
         }
 
-        return res.status(200).send('Resident deleted successfully')
+        return res.status(200).send("Resident deleted successfully")
     })
 }
 
@@ -156,11 +185,11 @@ exports.changeResidentPassword = (req, res) => {
 
     db.query(sql, [username], (err, results) => {
         if (err) {
-            return res.status(500).send('Server error')
+            return res.status(500).send("Server error")
         }
 
         if (results.length === 0) {
-            return res.status(404).send('User not found')
+            return res.status(404).send("User not found")
         }
 
         bcrypt.compare(
@@ -168,11 +197,11 @@ exports.changeResidentPassword = (req, res) => {
             results[0].password_hash,
             (err, isMatch) => {
                 if (err) {
-                    return res.status(500).send('Error verifying passwordn')
+                    return res.status(500).send("Error verifying passwordn")
                 }
 
                 if (!isMatch) {
-                    return res.status(401).send('Incorrect old password')
+                    return res.status(401).send("Incorrect old password")
                 }
 
                 bcrypt.hash(
@@ -182,7 +211,7 @@ exports.changeResidentPassword = (req, res) => {
                         if (err) {
                             return res
                                 .status(500)
-                                .send('Error hashing new password')
+                                .send("Error hashing new password")
                         }
 
                         const updateSql = `UPDATE Blacksburg_Resident SET password_hash = ? WHERE username = ?`
@@ -194,18 +223,18 @@ exports.changeResidentPassword = (req, res) => {
                                 if (err) {
                                     return res
                                         .status(500)
-                                        .send('Server error updating password')
+                                        .send("Server error updating password")
                                 }
 
                                 if (result.affectedRows === 0) {
                                     return res
                                         .status(404)
-                                        .send('User not found during update')
+                                        .send("User not found during update")
                                 }
 
                                 return res
                                     .status(200)
-                                    .send('Password changed successfully')
+                                    .send("Password changed successfully")
                             }
                         )
                     }

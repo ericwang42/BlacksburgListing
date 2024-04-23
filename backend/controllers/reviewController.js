@@ -1,4 +1,4 @@
-const db = require('../database')
+const db = require("../database")
 
 exports.createReview = (req, res) => {
     const {
@@ -41,10 +41,9 @@ exports.readReview = (req, res) => {
         }
 
         if (results.length == 0) {
-            return res.status(404).send('No reviews found')
+            return res.status(404).send("No reviews found")
         }
 
-        // res.status(200).send('Reviews retrieved successfully')
         return res.status(200).json(results)
     })
 }
@@ -60,10 +59,9 @@ exports.readReviewById = (req, res) => {
         }
 
         if (results.length == 0) {
-            return res.status(404).send('No review found with this id')
+            return res.status(404).send("No review found with this id")
         }
 
-        // res.status(200).send('Review retrieved successfully')
         return res.status(200).json(result)
     })
 }
@@ -86,10 +84,10 @@ exports.getReviewAndResident = (req, res) => {
         if (results.length == 0) {
             return res
                 .status(404)
-                .send('Review not found or resident details missing')
+                .send("Review not found or resident details missing")
         }
 
-        res.status(200).send('Review retrieved successfully')
+        res.status(200).send("Review retrieved successfully")
         return res.json(results)
     })
 }
@@ -122,10 +120,10 @@ exports.updateReview = (req, res) => {
             }
 
             if (result.affectedRows == 0) {
-                return res.status(404).send('Review not found')
+                return res.status(404).send("Review not found")
             }
 
-            return res.status(200).send('Review updated successfully')
+            return res.status(200).send("Review updated successfully")
         }
     )
 }
@@ -141,9 +139,9 @@ exports.deleteReview = (req, res) => {
         }
 
         if (result.affectedRows == 0) {
-            return res.status(404).send('Review not found')
+            return res.status(404).send("Review not found")
         }
 
-        return res.status(200).send('Review deleted successfully')
+        return res.status(200).send("Review deleted successfully")
     })
 }
