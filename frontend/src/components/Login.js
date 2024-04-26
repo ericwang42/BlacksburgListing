@@ -28,6 +28,7 @@ const Login = () => {
             .then((response) => {
                 console.log("Login Success:", response.data)
                 alert("Successfully logged in")
+                localStorage.setItem('jwtToken', response.data.token);
             })
             .catch((error) => {
                 console.error(

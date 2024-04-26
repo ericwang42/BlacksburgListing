@@ -1,5 +1,15 @@
 const db = require("../database")
 const bcrypt = require("bcrypt")
+const jwt = require('jsonwebtoken')
+
+const JWT_SECRET = 'your_secret_key_here'
+
+const generateToken = (user) => {
+    return jwt.sign({
+      user_id: user.user_id,
+      user_type: user.user_type
+    }, JWT_SECRET, { expiresIn: '1h' }); 
+  };
 
 exports.login = (req, res) => {
     const { username, password } = req.body
@@ -59,8 +69,11 @@ exports.login = (req, res) => {
                 })
 
                 if (result) {
-                    return res.json(result)
-                }
+                    const token = generateToken({
+                        user_id: result.user_id,
+                        user_type: result.user_type
+                    });
+                    return res.json({ token });                }
             } catch (err) {
                 return res.status(500).send("Server error")
             }
