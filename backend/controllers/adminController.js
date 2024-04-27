@@ -155,3 +155,70 @@ exports.deleteAdmin = (req, res) => {
         return res.status(200).send("Admin deleted successfully")
     })
 }
+
+exports.changeAdminPassword = (req, res) => {
+    const { oldPassword, newPassword } = req.body
+    const userId = req.params.id
+
+    const sql = `SELECT password_hash FROM Admin WHERE admin_id = ?`
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            return res.status(500).send("Server error")
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send("User not found")
+        }
+
+        bcrypt.compare(
+            oldPassword,
+            results[0].password_hash,
+            (err, isMatch) => {
+                if (err) {
+                    return res.status(500).send("Error verifying password")
+                }
+                if (!isMatch) {
+                    return res.status(401).send("Incorrect old password")
+                }
+
+                bcrypt.hash(
+                    newPassword,
+                    saltRounds,
+                    (err, hashedNewPassword) => {
+                        if (err) {
+                            return res
+                                .status(500)
+                                .send("Error hashing new password")
+                        }
+
+                        const updateSql = `UPDATE Admin SET password_hash = ? WHERE admin_id = ?`
+
+                        db.query(
+                            updateSql,
+                            [hashedNewPassword, userId],
+                            (err, result) => {
+                                if (err) {
+                                    return res
+                                        .status(500)
+                                        .send("Server error updating password")
+                                }
+
+                                if (result.affectedRows === 0) {
+                                    return res
+                                        .status(404)
+                                        .send("User not found during update")
+                                }
+
+                                return res
+                                    .status(200)
+                                    .send("Password changed successfully")
+                            }
+                        )
+                    }
+                )
+            }
+        )
+    })
+}
+

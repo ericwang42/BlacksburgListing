@@ -179,11 +179,12 @@ exports.deleteResident = (req, res) => {
 }
 
 exports.changeResidentPassword = (req, res) => {
-    const { username, oldPassword, newPassword } = req.body
+    const { oldPassword, newPassword } = req.body
+    const userId = req.params.id
 
-    const sql = `SELECT password_hash FROM Blacksburg_Resident WHERE username = ?`
+    const sql = `SELECT password_hash FROM Blacksburg_Resident WHERE resident_id = ?`
 
-    db.query(sql, [username], (err, results) => {
+    db.query(sql, [userId], (err, results) => {
         if (err) {
             return res.status(500).send("Server error")
         }
@@ -214,11 +215,11 @@ exports.changeResidentPassword = (req, res) => {
                                 .send("Error hashing new password")
                         }
 
-                        const updateSql = `UPDATE Blacksburg_Resident SET password_hash = ? WHERE username = ?`
+                        const updateSql = `UPDATE Blacksburg_Resident SET password_hash = ? WHERE resident_id = ?`
 
                         db.query(
                             updateSql,
-                            [hashedNewPassword, username],
+                            [hashedNewPassword, userId],
                             (err, result) => {
                                 if (err) {
                                     return res

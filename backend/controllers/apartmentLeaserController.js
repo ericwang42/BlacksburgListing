@@ -210,11 +210,12 @@ exports.deleteLeaser = (req, res) => {
 }
 
 exports.changeLeaserPassword = (req, res) => {
-    const { username, oldPassword, newPassword } = req.body
+    const { oldPassword, newPassword } = req.body
+    const userId = req.params.id
 
-    const sql = `SELECT password_hash FROM Apartment_Leaser WHERE username = ?`
+    const sql = `SELECT password_hash FROM Apartment_Leaser WHERE leaser_id = ?`
 
-    db.query(sql, [username], (err, results) => {
+    db.query(sql, [userId], (err, results) => {
         if (err) {
             return res.status(500).send("Server error")
         }
@@ -244,11 +245,11 @@ exports.changeLeaserPassword = (req, res) => {
                                 .send("Error hashing new password")
                         }
 
-                        const updateSql = `UPDATE Apartment_Leaser SET password_hash = ? WHERE username = ?`
+                        const updateSql = `UPDATE Apartment_Leaser SET password_hash = ? WHERE leaser_id = ?`
 
                         db.query(
                             updateSql,
-                            [hashedNewPassword, username],
+                            [hashedNewPassword, userId],
                             (err, result) => {
                                 if (err) {
                                     return res

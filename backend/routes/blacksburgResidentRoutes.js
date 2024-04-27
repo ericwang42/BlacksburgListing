@@ -7,6 +7,6 @@ router.get('/', blacksburgResidentController.readResident)
 router.get('/:id', blacksburgResidentController.readResidentById)
 router.put('/:id', blacksburgResidentController.updateResident)
 router.delete('/:id', blacksburgResidentController.deleteResident)
-router.post('/change-password', blacksburgResidentController.changeResidentPassword)
+router.post('/:id/change-password', blacksburgResidentController.changeResidentPassword)
 
 module.exports = router

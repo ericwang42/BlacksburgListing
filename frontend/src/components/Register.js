@@ -2,6 +2,8 @@ import React, { useState } from "react"
 import { Button, Card, Form } from "react-bootstrap"
 import registerBackground from "../assets/registerbackground.jpg" // Import the register background image
 import axios from "axios"
+import { useNavigate } from 'react-router-dom';
+
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +15,8 @@ const Register = () => {
         confirmPassword: "",
         userType: "",
     })
+    const navigate = useNavigate();
+
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -62,6 +66,7 @@ const Register = () => {
                 confirmPassword: "",
                 userType: "",
             })
+            navigate('/login');
         } catch (error) {
             if (error.response && error.response.status === 409) {
                 console.error("Registration failed: Username already in use");
