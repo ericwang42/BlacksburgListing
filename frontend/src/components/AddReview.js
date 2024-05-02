@@ -1,16 +1,34 @@
 import React, { useState } from "react"
 import { Container, Row, Col, Form, Button } from "react-bootstrap"
+import Rating from "@mui/material/Rating"
+import axios from "axios"
 
-const AddReview = ({ type, onAddReview }) => {
-    const [rating, setRating] = useState("")
+const AddReview = ({ id, type, userId, onAddReview }) => {
+    const [rating, setRating] = useState(0)
     const [description, setDescription] = useState("")
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log("Submitted Review:", { rating, description })
-        onAddReview({ rating, description })
-        setRating("")
-        setDescription("")
+        const reviewData = {
+            rating: rating,
+            review_description: description,
+            reviewer_id: userId,
+            apartment_review_id: type === "Apartment" ? id : null,
+            dorm_review_id: type === "Dorm" ? id : null,
+        }
+
+        try {
+            const response = await axios.post(
+                "http://localhost:3001/api/Review",
+                reviewData
+            )
+            console.log("Review submitted successfully")
+            onAddReview(response.data)
+            setRating(0)
+            setDescription("")
+        } catch (error) {
+            console.error("Failed to submit review:", error)
+        }
     }
 
     return (
@@ -20,11 +38,10 @@ const AddReview = ({ type, onAddReview }) => {
                     <h2>Add a Review</h2>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group controlId='rating'>
-                            <Form.Label>Rating</Form.Label>
-                            <Form.Control
-                                type='number'
+                            <Rating
+                                name='simple-controlled'
                                 value={rating}
-                                onChange={(e) => setRating(e.target.value)}
+                                onChange={(e, newValue) => setRating(newValue)}
                             />
                         </Form.Group>
                         <Form.Group controlId='description'>
@@ -36,7 +53,11 @@ const AddReview = ({ type, onAddReview }) => {
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </Form.Group>
-                        <Button variant='dark' type='submit'>
+                        <Button
+                            variant='dark'
+                            type='submit'
+                            style={{ marginTop: "20px" }}
+                        >
                             Submit Review
                         </Button>
                     </Form>

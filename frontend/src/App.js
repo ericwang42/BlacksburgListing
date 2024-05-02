@@ -10,21 +10,35 @@ import Login from "./components/Login.js"
 import ListingDetails from "./components/ListingDetails.js"
 import AddReview from "./components/AddReview.js"
 import Profile from "./components/Profile.js"
+import AdminPanel from "./components/adminPanel.js"
+import AddListing from "./components/AddListing"
 
 function App() {
     return (
-        <Router>
-            <div className='josefin-sans'>
-                <Navbar />
-                <Routes>
-                    <Route path='/' element={<Home />} />
-                    <Route path='/register' element={<Register />} />
-                    <Route path='/login' element={<Login />} />
-                    <Route path="/listing/:id/:type" element={ListingDetails} />
-                    <Route path='/profile' element={<Profile />} />
-                </Routes>
+        <>
+            <div>
+                <Router>
+                    <div className='josefin-sans'>
+                        <Navbar />
+                        <Routes>
+                            <Route path='/' element={<Home />} />
+                            <Route path='/register' element={<Register />} />
+                            <Route path='/login' element={<Login />} />
+                            <Route
+                                path='/listing/:id/:type'
+                                element={<ListingDetails />}
+                            />
+                            <Route path='/profile' element={<Profile />} />
+                            <Route path='/admin' element={<AdminPanel />} />
+                            <Route
+                                path='/create-listing'
+                                element={<AddListing />}
+                            />
+                        </Routes>
+                    </div>
+                </Router>
             </div>
-        </Router>
+        </>
     )
 }
 

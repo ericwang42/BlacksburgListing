@@ -17,11 +17,23 @@ const AdminPanel = () => {
         formData.forEach((value, key) => {
             data[key] = value
         })
+
+        const headers = {}
+        if (
+            selectedTable === "Apartment_Listing" ||
+            selectedTable === "Dorm_Listing"
+        ) {
+            headers["Content-Type"] = "multipart/form-data"
+        }
+
         axios
-            .post(`http://localhost:3001/api/${selectedTable}`, data)
+            .post(`http://localhost:3001/api/${selectedTable}`, data, {
+                headers,
+            })
             .then((response) => {
                 console.log("Create operation successful:", response.data)
                 fetchTableData()
+                event.target.reset()
             })
             .catch((error) => {
                 console.error("Error performing create operation:", error)
@@ -36,12 +48,12 @@ const AdminPanel = () => {
             data[key] = value
         })
         const id = Object.values(data)[0]
-        // delete ;
         axios
             .put(`http://localhost:3001/api/${selectedTable}/${id}`, data)
             .then((response) => {
                 console.log("Update operation successful:", response.data)
                 fetchTableData()
+                event.target.reset()
             })
             .catch((error) => {
                 console.error("Error performing update operation:", error)
@@ -51,19 +63,17 @@ const AdminPanel = () => {
     const handleDeleteSubmit = (event) => {
         event.preventDefault()
         const formData = new FormData(event.target)
-
         const data = {}
         formData.forEach((value, key) => {
             data[key] = value
         })
         const id = Object.values(data)[0]
-        console.log(id)
-
         axios
             .delete(`http://localhost:3001/api/${selectedTable}/${id}`)
             .then((response) => {
                 console.log("Delete operation successful:", response.data)
                 fetchTableData()
+                event.target.reset()
             })
             .catch((error) => {
                 console.error("Error performing delete operation:", error)
@@ -94,6 +104,8 @@ const AdminPanel = () => {
             { label: "zip_code", name: "zip_code", type: "number" },
             { label: "leaser_name", name: "leaser_name", type: "text" },
             { label: "leaser_no", name: "leaser_no", type: "number" },
+            { label: "description", name: "description", type: "text" },
+            { label: "price", name: "price", type: "number" },
         ],
         Dorm_Listing: [
             { label: "dorm_id", name: "dorm_id", type: "number" },
@@ -103,6 +115,8 @@ const AdminPanel = () => {
             { label: "state", name: "state", type: "text" },
             { label: "zip_code", name: "zip_code", type: "number" },
             { label: "dorm_name", name: "dorm_name", type: "text" },
+            { label: "description", name: "description", type: "text" },
+            { label: "price", name: "price", type: "number" },
         ],
         Review: [
             { label: "review_id", name: "review_id", type: "number" },
@@ -120,6 +134,10 @@ const AdminPanel = () => {
             },
             { label: "dorm_review_id", name: "dorm_review_id", type: "number" },
         ],
+        Admin: [
+            { label: "username", name: "username", type: "text" },
+            { label: "password_hash", name: "password_hash", type: "text" },
+        ],
     }
 
     const fetchTableData = () => {
@@ -131,10 +149,10 @@ const AdminPanel = () => {
                 })
                 .catch((error) => {
                     console.error("Error fetching table data:", error)
-                    setTableData([]) // Reset table data on error
+                    setTableData([])
                 })
         } else {
-            setTableData([]) // Reset table data when no table is selected
+            setTableData([])
         }
     }
 
@@ -171,6 +189,9 @@ const AdminPanel = () => {
                     </Dropdown.Item>
                     <Dropdown.Item onClick={() => handleTableSelect("Review")}>
                         Review
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleTableSelect("Admin")}>
+                        Admin
                     </Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
@@ -212,6 +233,36 @@ const AdminPanel = () => {
                                     </Col>
                                 ))}
                         </Row>
+
+                        {selectedTable === "Apartment_Listing" ? (
+                            <Col>
+                                <Form.Group controlId='createFormFieldImage'>
+                                    <Form.Label>Listing Image</Form.Label>
+                                    <Form.Control
+                                        name='image'
+                                        type='file'
+                                        accept='image/*'
+                                    />
+                                </Form.Group>
+                            </Col>
+                        ) : (
+                            <></>
+                        )}
+                        {selectedTable === "Dorm_Listing" ? (
+                            <Col>
+                                <Form.Group controlId='createFormFieldDormImage'>
+                                    <Form.Label>Dorm Image</Form.Label>
+                                    <Form.Control
+                                        name='image'
+                                        type='file'
+                                        accept='image/*'
+                                    />
+                                </Form.Group>
+                            </Col>
+                        ) : (
+                            <></>
+                        )}
+
                         <Row className='mt-4'>
                             <Col>
                                 <Button variant='success' type='submit'>

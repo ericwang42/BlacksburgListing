@@ -58,7 +58,7 @@ exports.readReviewById = (req, res) => {
             return res.status(500).send(err)
         }
 
-        if (results.length == 0) {
+        if (result.length == 0) {
             return res.status(404).send("No review found with this id")
         }
 
@@ -87,8 +87,7 @@ exports.getReviewAndResident = (req, res) => {
                 .send("Review not found or resident details missing")
         }
 
-        res.status(200).send("Review retrieved successfully")
-        return res.json(results)
+        return res.status(200).json(results)
     })
 }
 

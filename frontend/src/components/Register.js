@@ -2,8 +2,7 @@ import React, { useState } from "react"
 import { Button, Card, Form } from "react-bootstrap"
 import registerBackground from "../assets/registerbackground.jpg" // Import the register background image
 import axios from "axios"
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate } from "react-router-dom"
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -15,8 +14,7 @@ const Register = () => {
         confirmPassword: "",
         userType: "",
     })
-    const navigate = useNavigate();
-
+    const navigate = useNavigate()
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -38,9 +36,9 @@ const Register = () => {
 
         let apiUrl
         if (formData.userType === "resident") {
-            apiUrl = "/api/Blacksburg_Resident/register"
+            apiUrl = "/api/Blacksburg_Resident/"
         } else if (formData.userType === "landlord") {
-            apiUrl = "/api/Apartment_Leaser/register"
+            apiUrl = "/api/Apartment_Leaser/"
         }
 
         try {
@@ -66,14 +64,14 @@ const Register = () => {
                 confirmPassword: "",
                 userType: "",
             })
-            navigate('/login');
+            navigate("/login")
         } catch (error) {
             if (error.response && error.response.status === 409) {
-                console.error("Registration failed: Username already in use");
-                alert("Registration failed: Username already in use");
+                console.error("Registration failed: Username already in use")
+                alert("Registration failed: Username already in use")
             } else {
-                console.error(`Registration failed: ${error}`);
-                alert("Registration failed!");
+                console.error(`Registration failed: ${error}`)
+                alert("Registration failed!")
             }
         }
     }

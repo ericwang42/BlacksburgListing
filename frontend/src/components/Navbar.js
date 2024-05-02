@@ -1,15 +1,26 @@
-import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";  // Import useNavigate instead of useHistory
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import React, { useState, useEffect } from "react"
+import { NavLink, useNavigate } from "react-router-dom"
+import { jwtDecode } from "jwt-decode" // Ensure jwt-decode is correctly imported
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 
 const Navbar = () => {
-    const navigate = useNavigate();  // Use useNavigate hook for navigation
-    const isAuthenticated = !!localStorage.getItem('jwtToken');  // Check if JWT token is stored
+    const navigate = useNavigate()
+    const isAuthenticated = !!localStorage.getItem("jwtToken")
+    const [userType, setUserType] = useState("")
+
+    useEffect(() => {
+        const token = localStorage.getItem("jwtToken")
+        if (token) {
+            const decoded = jwtDecode(token)
+            setUserType(decoded.user_type)
+            console.log(userType)
+        }
+    }, [isAuthenticated])
 
     const handleLogout = () => {
-        localStorage.removeItem('jwtToken');  // Remove the stored JWT token
-        navigate('/login');  // Redirect user to the login page using navigate instead of history.push
-    };
+        localStorage.removeItem("jwtToken")
+        navigate("/login")
+    }
 
     return (
         <nav className='navbar navbar-expand-lg navbar-dark bg-dark'>
@@ -33,7 +44,10 @@ const Navbar = () => {
                         {!isAuthenticated ? (
                             <>
                                 <li className='nav-item'>
-                                    <NavLink className='nav-link' to='/register'>
+                                    <NavLink
+                                        className='nav-link'
+                                        to='/register'
+                                    >
                                         Register
                                     </NavLink>
                                 </li>
@@ -50,8 +64,31 @@ const Navbar = () => {
                                         <AccountCircleIcon />
                                     </NavLink>
                                 </li>
+                                {userType === "Admin" && (
+                                    <li className='nav-item'>
+                                        <NavLink
+                                            className='nav-link'
+                                            to='/admin'
+                                        >
+                                            Admin Panel
+                                        </NavLink>
+                                    </li>
+                                )}
+                                {userType === "Apartment_Leaser" && (
+                                    <li className='nav-item'>
+                                        <NavLink
+                                            className='nav-link'
+                                            to='/create-listing'
+                                        >
+                                            Create Listing
+                                        </NavLink>
+                                    </li>
+                                )}
                                 <li className='nav-item'>
-                                    <button className='nav-link btn btn-link' onClick={handleLogout}>
+                                    <button
+                                        className='nav-link btn btn-link'
+                                        onClick={handleLogout}
+                                    >
                                         Logout
                                     </button>
                                 </li>
@@ -61,7 +98,7 @@ const Navbar = () => {
                 </div>
             </div>
         </nav>
-    );
+    )
 }
 
-export default Navbar;
+export default Navbar

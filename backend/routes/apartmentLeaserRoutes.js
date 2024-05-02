@@ -1,12 +1,15 @@
-const express = require('express')
+const express = require("express")
 const router = express.Router()
-const apartmentLeaserController = require('../controllers/apartmentLeaserController')
+const apartmentLeaserController = require("../controllers/apartmentLeaserController")
 
-router.post('/register', apartmentLeaserController.registerLeaser)
-router.get('/', apartmentLeaserController.readLeaser)
-router.get('/:id', apartmentLeaserController.readLeaserById)
-router.put('/:id', apartmentLeaserController.updateLeaser)
-router.delete('/:id', apartmentLeaserController.deleteLeaser)
-router.post('/:id/change-password', apartmentLeaserController.changeLeaserPassword)
+router.post("/", apartmentLeaserController.registerLeaser)
+router.get("/", apartmentLeaserController.readLeaser)
+router.get("/:id", apartmentLeaserController.readLeaserById)
+router.put("/:id", apartmentLeaserController.updateLeaser)
+router.delete("/:id", apartmentLeaserController.deleteLeaser)
+router.post(
+    "/:id/change-password",
+    apartmentLeaserController.changeLeaserPassword
+)
 
 module.exports = router

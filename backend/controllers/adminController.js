@@ -34,7 +34,7 @@ function usernameExists(username, db, callback) {
 }
 
 exports.registerAdmin = (req, res) => {
-    const { username, password } = req.body
+    const { username, password_hash } = req.body
 
     db.beginTransaction((err) => {
         if (err) {
@@ -49,7 +49,7 @@ exports.registerAdmin = (req, res) => {
                 return
             }
 
-            bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+            bcrypt.hash(password_hash, saltRounds, (err, hashedPassword) => {
                 if (err) {
                     db.rollback(() =>
                         res.status(500).send("Error hashing password")
